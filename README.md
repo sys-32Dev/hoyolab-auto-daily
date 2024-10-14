@@ -10,6 +10,7 @@ Repository version:
 
 - [Getting your cookie](#getting-your-cookie)
 - [Usage](#usage)
+- [Multiple Accounts](#multiple-accounts)
 - [Discord Webhook](#discord-webhook)
 - [FAQ](#faq)
   - [Is this safe?](#is-this-safe)
@@ -109,6 +110,14 @@ You have to check in manually first to get your cookie, follow these steps (clic
 
 10. You're set! Hop on your game the next day and see if you got the rewards
 
+## Multiple Accounts
+
+<details>
+  <summary>To add other accounts, you can add another cookie and games in a new line like below.</summary>
+  <img src="https://github.com/user-attachments/assets/99fd25cd-71f6-4aae-9949-11d055fadf73" />
+  <img src="https://github.com/user-attachments/assets/4a56f4e1-8fb4-4137-acc6-ac30cade78f1" />
+</details>
+
 ## Discord Webhook
 
 You may use Discord webhook to send notifications to your channel!
@@ -133,7 +142,13 @@ You may use Discord webhook to send notifications to your channel!
    <img src="https://github.com/sglkc/hoyolab-auto-daily/assets/31957516/15b029ff-906d-472c-b356-ae9efed4477b" />
    </details>
 
-5. You may trigger the check in manually and see if the messages got sent
+5. <details>
+   <summary>(Optional) If you want to be tagged on check in, add `DISCORD_USER` variable with your Discord ID.</summary>
+   <img src="https://github.com/user-attachments/assets/995a4b18-4c22-4dcd-9a2e-90fac74079c1" />
+   <img src="https://github.com/user-attachments/assets/52dff051-abb4-4cc0-b834-685d49a06731" />
+   </details>
+
+6. You may trigger the check in manually and see if the messages got sent
 
 ## FAQ
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const args = process.argv.slice(2)
-const cookie = process.env.COOKIE
+const cookies = process.env.COOKIE.split('\n').map(s => s.trim())
+const games = process.env.GAMES.split('\n').map(s => s.trim())
 const discordWebhook = process.env.DISCORD_WEBHOOK
 const discordUser = process.env.DISCORD_USER
 const msgDelimiter = ':'
@@ -15,28 +15,23 @@ const endpoints = {
 }
 
 let hasErrors = false
+let latestGames = []
 
-async function main() {
-  if (!args.length) {
-    log('error', 'Argument is empty!')
-    log('info', 'Usage:   node index.js [zzz] [gi] [hsr] [hi3] [tot]')
-    log('info', 'Example: node index.js hsr')
-    log('info', '         node index.js zzz gi hsr')
-    throw new Error('No argument passed.')
+async function run(cookie, games) {
+  if (!games) {
+    games = latestGames
+  } else {
+    games = games.split(' ')
+    latestGames = games
   }
 
-  if (!cookie) {
-    throw new Error('COOKIE environment variable not set!')
-  }
-
-  // begin processing command arguments
-  for (const arg of args) {
-    const game = arg.toLowerCase()
+  for (let game of games) {
+    game = game.toLowerCase()
 
     log('debug', `\n----- CHECKING IN FOR ${game} -----`)
 
     if (!(game in endpoints)) {
-      log('error', `Game ${arg} is invalid. Available games are: zzz, gi, hsr, hi3, and tot`)
+      log('error', `Game ${game} is invalid. Available games are: zzz, gi, hsr, hi3, and tot`)
       continue
     }
 
@@ -73,6 +68,8 @@ async function main() {
     headers.set('sec-fetch-site', 'same-site')
     headers.set('sec-gpc', '1')
 
+    headers.set("x-rpc-signgame", game)
+
     headers.set('user-agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36')
 
     const res = await fetch(url, { method: 'POST', headers, body })
@@ -104,16 +101,6 @@ async function main() {
     }
 
     log('error', game, `Error undocumented, report to Issues page if this persists`)
-  }
-
-  // send to discord webhook if set and valid url
-  if (discordWebhook && URL.canParse(discordWebhook)) {
-    await discordWebhookSend()
-  }
-
-  if (hasErrors) {
-    console.log('')
-    throw new Error('Error(s) occured.')
   }
 }
 
@@ -158,7 +145,7 @@ async function discordWebhookSend() {
   }
   let discordMsg = ""
   if (discordUser) {
-      discordMsg = `<@${discordUser}>\n` 
+      discordMsg = `<@${discordUser}>\n`
   }
   discordMsg += messages.map(msg => `(${msg.type.toUpperCase()}) ${msg.string}`).join('\n')
 
@@ -180,4 +167,24 @@ async function discordWebhookSend() {
   log('error', 'Error sending message to Discord webhook, please check URL and permissions')
 }
 
-await main()
+if (!cookies || !cookies.length) {
+  throw new Error('COOKIE environment variable not set!')
+}
+
+if (!games || !games.length) {
+  throw new Error('GAMES environment variable not set!')
+}
+
+for (const index in cookies) {
+  log('info', `-- CHECKING IN FOR ACCOUNT ${Number(index) + 1} --`)
+  await run(cookies[index], games[index])
+}
+
+if (discordWebhook && URL.canParse(discordWebhook)) {
+  await discordWebhookSend()
+}
+
+if (hasErrors) {
+  console.log('')
+  throw new Error('Error(s) occured.')
+}
